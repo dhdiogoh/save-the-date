@@ -296,6 +296,9 @@ section {
   align-items: center;
 }
 @media (min-width: 900px) {
+  .mobile-only-break {
+    display: none;
+  }
   .antecip-grid {
     grid-template-columns: 1fr 1.1fr;
   }
@@ -448,6 +451,27 @@ section {
   align-items: center;
   gap: 0.6rem;
   will-change: opacity;
+}
+.invite-hint-btn {
+  background: none;
+  border: none;
+  padding: 0.5rem 0.8rem;
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+.invite-hint-arrow {
+  display: inline-block;
+  font-size: 0.9rem;
+  animation: invite-hint-bounce 1.6s ease-in-out infinite;
+}
+@keyframes invite-hint-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(4px);
+  }
 }
 
 /* ============================================================

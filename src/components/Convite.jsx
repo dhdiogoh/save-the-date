@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import AccentIllustration from './AccentIllustration'
+import { useLenis } from '../context/LenisContext'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -12,6 +13,20 @@ export default function Convite() {
   const cardRef = useRef(null)
   const hintRef = useRef(null)
   const hintEndRef = useRef(null)
+  const lenis = useLenis()
+
+  // a carta já terminou de se revelar quando esse hint aparece, então dar um
+  // empurrão de scroll aqui é seguro — não mexe na animação da revelação,
+  // só ajuda quem não percebeu que dá pra continuar rolando a página.
+  function handleContinueNudge() {
+    const nudge = window.innerHeight * 0.6
+    const target = window.scrollY + nudge
+    if (lenis) {
+      lenis.scrollTo(target, { duration: 1 })
+    } else {
+      window.scrollBy({ top: nudge, behavior: 'smooth' })
+    }
+  }
 
   useEffect(() => {
     const body = bodyRef.current
@@ -46,7 +61,7 @@ export default function Convite() {
       .to(card, { opacity: 1, width: revealWidth, duration: 1.7, ease: 'power2.out' }, 0.95)
 
     if (hintEnd) {
-      tl.to(hintEnd, { opacity: 1, duration: 0.5 }, 3.2)
+      tl.to(hintEnd, { opacity: 1, pointerEvents: 'auto', duration: 0.5 }, 3.2)
     }
 
     // segura a cena revelada por um bom tempo antes de liberar o scroll
@@ -91,9 +106,16 @@ export default function Convite() {
             <span>continue para abrir</span>
           </div>
 
-          <div className="invite-hint invite-hint-end" ref={hintEndRef} style={{ opacity: 0 }}>
+          <button
+            type="button"
+            className="invite-hint invite-hint-end invite-hint-btn"
+            ref={hintEndRef}
+            style={{ opacity: 0, pointerEvents: 'none' }}
+            onClick={handleContinueNudge}
+          >
             <span>continue</span>
-          </div>
+            <span className="invite-hint-arrow">↓</span>
+          </button>
         </div>
       </div>
     </section>

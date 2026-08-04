@@ -177,7 +177,8 @@ export default function RSVPForm() {
             Vem celebrar com a gente?
           </h2>
           <p className="lead" data-reveal>
-            Sua presença é o presente. Preencha abaixo para confirmar — vai ser uma alegria ter você lá.
+            O que mais queremos é ter você com a gente nesse dia. Preencha abaixo para confirmar — vai ser uma
+            alegria ter você lá.
           </p>
           <span className="deadline-badge" data-reveal>
             Confirme até {formatDeadline(WEDDING_INFO.rsvpDeadline)}

@@ -24,7 +24,7 @@ export default function Antecipacao() {
           </span>
           <h2 className="section-title" data-reveal>
             Estamos contando os dias
-            <br />
+            <br className="mobile-only-break" />
             para celebrar com você
           </h2>
           <p className="lead" data-reveal>
