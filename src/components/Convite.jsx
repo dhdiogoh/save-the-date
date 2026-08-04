@@ -25,7 +25,9 @@ export default function Convite() {
 
     // largura final do card no auge da revelação, calculada em px
     // (equivalente ao antigo scale, mas via layout real — evita blur de upscale)
-    const revealWidth = Math.min(Math.max(300, window.innerWidth * 0.97), 764)
+    // no desktop o teto é bem menor: 97% da viewport ficaria enorme numa tela larga
+    const maxRevealWidth = window.innerWidth >= 900 ? 480 : 764
+    const revealWidth = Math.min(Math.max(300, window.innerWidth * 0.97), maxRevealWidth)
 
     const tl = gsap.timeline({
       scrollTrigger: {

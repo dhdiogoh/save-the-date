@@ -63,13 +63,6 @@ export default function Local() {
             </svg>
             {WEDDING_INFO.venue.name} — {WEDDING_INFO.venue.address.replace(/,\s*Belém.*$/, '')}
           </span>
-          <a className="btn-map" href={WEDDING_INFO.venue.mapsUrl} target="_blank" rel="noopener" data-reveal>
-            <svg viewBox="0 0 24 24">
-              <path d="M9 20l-5.5 2V6L9 4l6 2 5.5-2v16L15 22z" />
-              <path d="M9 4v16M15 6v16" />
-            </svg>
-            Ver no mapa
-          </a>
         </div>
 
         <div className="local-figure" data-reveal>

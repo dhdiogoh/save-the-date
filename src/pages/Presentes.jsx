@@ -1,9 +1,11 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { LenisProvider } from '../context/LenisContext'
 import { RevealProvider } from '../context/RevealContext'
 import AccentIllustration from '../components/AccentIllustration'
 import GiftCard from '../components/GiftCard'
-import { mockGifts } from '../data/mockGifts'
+import GiftCheckoutModal from '../components/GiftCheckoutModal'
+import { supabase } from '../lib/supabaseClient'
 
 export default function Presentes() {
   return (
@@ -16,6 +18,45 @@ export default function Presentes() {
 }
 
 function PresentesContent() {
+  const [gifts, setGifts] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState(false)
+  const [selectedGift, setSelectedGift] = useState(null)
+
+  async function loadGifts() {
+    if (!supabase) {
+      setLoadError(true)
+      setLoading(false)
+      return
+    }
+    const { data, error } = await supabase.from('presentes_progresso').select('*').order('ordem')
+    if (error) {
+      console.error('[presentes] falha ao carregar lista:', error)
+      setLoadError(true)
+    } else {
+      setGifts(data)
+      setLoadError(false)
+    }
+    setLoading(false)
+  }
+
+  useEffect(() => {
+    loadGifts()
+
+    if (!supabase) return undefined
+
+    const channel = supabase
+      .channel('presentes-progresso')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'presentes' }, () => {
+        loadGifts()
+      })
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [])
+
   return (
     <section className="gifts-page bg-ivory-2">
       <AccentIllustration
@@ -42,23 +83,30 @@ function PresentesContent() {
             Lista de Presentes
           </span>
           <h1 className="section-title" data-reveal>
-            Um mimo pra gente começar essa nova fase
+            Presentes para a nossa casa
           </h1>
           <p className="lead gifts-lead" data-reveal>
-            Montamos essa lista pensando no que realmente vai nos ajudar a começar essa nova fase em casa. Cada item
-            tem um valor de referência, e ao escolher presentear, esse valor vai direto pra gente — assim
-            conseguimos priorizar as compras conforme a necessidade real do momento, sem correr o risco de duplicar
-            presentes ou receber algo que já temos. É prático pra quem mora longe, e garante que cada contribuição
-            realmente vai virar aquilo que estamos precisando.
+            Montamos essa lista pensando no que realmente vai nos ajudar a começar essa nova fase em casa. Alguns
+            itens podem ser presenteados em cotas — escolha quantas quiser. O pagamento é feito direto pra gente,
+            e a barra de progresso de cada item atualiza na hora.
           </p>
         </div>
 
-        <div className="gifts-grid">
-          {mockGifts.map((gift) => (
-            <GiftCard key={gift.id} gift={gift} />
-          ))}
-        </div>
+        {loading && <p className="gifts-status">Carregando lista...</p>}
+        {!loading && loadError && (
+          <p className="gifts-status">Não conseguimos carregar a lista agora. Tenta recarregar a página.</p>
+        )}
+
+        {!loading && !loadError && (
+          <div className="gifts-grid">
+            {gifts.map((gift) => (
+              <GiftCard key={gift.id} gift={gift} onSelect={() => setSelectedGift(gift)} />
+            ))}
+          </div>
+        )}
       </div>
+
+      {selectedGift && <GiftCheckoutModal gift={selectedGift} onClose={() => setSelectedGift(null)} />}
     </section>
   )
 }

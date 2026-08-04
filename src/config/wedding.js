@@ -1,5 +1,5 @@
 export const WEDDING_INFO = {
-  date: '2026-10-24T16:00:00-03:00',
+  date: '2026-10-24T17:00:00-03:00',
   coupleNames: { groom: 'Diogo', bride: 'Amanda' },
   venue: {
     name: 'Garden 821',
@@ -8,5 +8,5 @@ export const WEDDING_INFO = {
       'https://www.google.com/maps/search/?api=1&query=Garden+821+Travessa+Nove+de+Janeiro+821+Belem+PA',
   },
   rsvpDeadline: '2026-08-22',
-  timeNote: 'horário em breve',
+  timeNote: 'às 17h',
 }

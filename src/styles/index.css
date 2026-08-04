@@ -372,7 +372,7 @@ section {
 }
 .invite-scroll {
   position: relative;
-  height: 360vh;
+  height: 360svh;
 }
 .invite-sticky {
   position: sticky;
@@ -751,6 +751,18 @@ section {
   margin-top: 0.55rem;
   line-height: 1.45;
 }
+.field-error {
+  font-size: 0.82rem;
+  color: #b3543f;
+  margin-top: -0.3rem;
+}
+.field-error-spaced {
+  margin-top: 0.5rem;
+}
+.gift-modal-checkout-note {
+  margin-top: -0.3rem;
+  margin-bottom: 0.9rem;
+}
 
 /* dependentes */
 .dependents {
@@ -883,6 +895,44 @@ section {
   color: var(--color-ink-soft);
   max-width: 34ch;
 }
+.btn-continue {
+  margin-top: 0.6rem;
+  padding: 0.85rem 1.4rem;
+  background: transparent;
+  color: var(--color-sage-deep);
+  border: 1.5px solid var(--color-sage);
+  border-radius: 14px;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition:
+    background 0.4s var(--ease),
+    color 0.4s var(--ease),
+    transform 0.3s var(--ease);
+}
+.btn-continue:hover {
+  background: var(--color-sage);
+  color: var(--color-ivory);
+  transform: translateY(-2px);
+}
+.btn-continue-arrow {
+  display: inline-block;
+  animation: btn-continue-bounce 1.6s ease-in-out infinite;
+}
+@keyframes btn-continue-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(4px);
+  }
+}
 
 /* ============================================================
    8 · ENCERRAMENTO
@@ -914,6 +964,13 @@ section {
 .closing-lettering {
   width: clamp(240px, 40vw, 460px);
   height: auto;
+}
+.btn-cal-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
 }
 .btn-cal {
   display: inline-flex;
@@ -971,6 +1028,7 @@ section {
    ============================================================ */
 .gifts-page {
   min-height: 100svh;
+  padding-top: clamp(1.6rem, 5vw, 3rem);
 }
 .gifts-page-wrap {
   display: flex;
@@ -1010,6 +1068,7 @@ section {
 }
 .gifts-lead {
   max-width: 62ch;
+  margin-bottom: clamp(1rem, 3vw, 1.8rem);
 }
 
 .gifts-grid {
@@ -1031,6 +1090,7 @@ section {
 .gift-card {
   display: flex;
   flex-direction: column;
+  height: 100%;
   background: var(--color-ivory);
   border: 1px solid rgba(163, 171, 132, 0.3);
   border-radius: 22px;
@@ -1046,10 +1106,13 @@ section {
 }
 .gift-card-img {
   position: relative;
-  aspect-ratio: 1 / 1;
+  width: 100%;
+  padding-top: 100%;
   background: var(--color-ivory-2);
 }
 .gift-card-img img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -1071,6 +1134,7 @@ section {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  flex: 1;
   gap: 0.4rem;
   padding: 1.3rem 1.4rem 1.6rem;
 }
@@ -1088,6 +1152,7 @@ section {
 }
 .btn-gift {
   width: 100%;
+  margin-top: auto;
   padding: 0.75rem 1rem;
   background: var(--color-sage);
   color: var(--color-ivory);
@@ -1110,6 +1175,149 @@ section {
   background: rgba(163, 171, 132, 0.35);
   cursor: not-allowed;
   transform: none;
+}
+
+.gifts-status {
+  text-align: center;
+  color: var(--color-ink-soft);
+  font-size: 0.95rem;
+  padding: 2rem 0;
+}
+
+.gift-card-img-placeholder {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--color-ivory-2), rgba(163, 171, 132, 0.2));
+}
+
+.gift-card-category {
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-sage-deep);
+  opacity: 0.8;
+}
+
+.gift-card-price-unit {
+  font-size: 0.78rem;
+  opacity: 0.8;
+}
+
+.gift-progress {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0.5rem;
+}
+.gift-progress-bar {
+  width: 100%;
+  height: 6px;
+  border-radius: 100px;
+  background: rgba(163, 171, 132, 0.22);
+  overflow: hidden;
+}
+.gift-progress-fill {
+  height: 100%;
+  background: var(--color-sage);
+  border-radius: 100px;
+  transition: width 0.5s var(--ease);
+}
+.gift-progress-label {
+  font-size: 0.74rem;
+  color: var(--color-ink-soft);
+}
+
+/* Modal de checkout de presente */
+.gift-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(44, 43, 38, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.2rem;
+  z-index: 100;
+}
+.gift-modal {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--color-ivory);
+  border-radius: 22px;
+  padding: 2rem 1.6rem 1.8rem;
+  box-shadow: 0 40px 80px -30px rgba(44, 43, 38, 0.5);
+}
+.gift-modal-close {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(163, 171, 132, 0.18);
+  color: var(--color-ink);
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.gift-modal-title {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 1.2rem;
+  color: var(--color-ink);
+  padding-right: 2rem;
+}
+.gift-modal-category {
+  font-size: 0.78rem;
+  color: var(--color-sage-deep);
+  margin-bottom: 1.2rem;
+}
+.gift-qty-stepper {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+.gift-qty-stepper button {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid rgba(163, 171, 132, 0.4);
+  background: var(--color-ivory-2);
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: var(--color-ink);
+}
+.gift-qty-stepper button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.gift-qty-stepper input {
+  width: 64px;
+  text-align: center;
+  padding: 0.6rem;
+  border-radius: 10px;
+  border: 1px solid rgba(163, 171, 132, 0.4);
+  background: var(--color-ivory-2);
+  font-size: 0.95rem;
+}
+.gift-modal-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 0;
+  margin-bottom: 0.9rem;
+  border-top: 1px solid rgba(163, 171, 132, 0.3);
+  font-size: 0.95rem;
+  color: var(--color-ink);
+}
+.gift-modal-total strong {
+  font-size: 1.15rem;
 }
 
 /* ============================================================

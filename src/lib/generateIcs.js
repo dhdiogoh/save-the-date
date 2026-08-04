@@ -1,3 +1,14 @@
+export function googleCalendarUrl() {
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: 'Casamento de Diogo & Amanda',
+    dates: '20261024T200000Z/20261025T000000Z',
+    details: 'Reserve a data! Mais informações em breve.',
+    location: 'Garden 821 - Tv. Nove de Janeiro, 821, Belém - PA',
+  })
+  return `https://calendar.google.com/calendar/render?${params.toString()}`
+}
+
 export function downloadWeddingIcs() {
   const ics = [
     'BEGIN:VCALENDAR',
@@ -6,8 +17,8 @@ export function downloadWeddingIcs() {
     'BEGIN:VEVENT',
     'UID:diogo-amanda-2026@savethedate',
     'DTSTAMP:20260801T120000Z',
-    'DTSTART:20261024T190000Z',
-    'DTEND:20261024T230000Z',
+    'DTSTART:20261024T200000Z',
+    'DTEND:20261025T000000Z',
     'SUMMARY:Casamento de Diogo & Amanda',
     'LOCATION:Garden 821 - Tv. Nove de Janeiro, 821, Belém - PA',
     'DESCRIPTION:Reserve a data! Mais informações em breve.',

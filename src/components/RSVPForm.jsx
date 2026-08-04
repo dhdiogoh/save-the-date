@@ -4,6 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import AccentIllustration from './AccentIllustration'
 import { submitRSVP } from '../lib/submitRSVP'
 import { WEDDING_INFO } from '../config/wedding'
+import { useLenis } from '../context/LenisContext'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -33,10 +34,64 @@ export default function RSVPForm() {
   const [dependentes, setDependentes] = useState([])
   const [submitted, setSubmitted] = useState(false)
   const [successName, setSuccessName] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState('')
+  const [nomeTouched, setNomeTouched] = useState(false)
+
+  const nomeIncompleto = nome.trim().length > 0 && nome.trim().split(/\s+/).filter(Boolean).length < 2
 
   const nomeRef = useRef(null)
   const telRef = useRef(null)
   const successRef = useRef(null)
+  const settleCleanupRef = useRef(null)
+  const lenis = useLenis()
+
+  function handleContinue() {
+    const target = document.getElementById('local')
+    if (lenis) {
+      lenis.scrollTo(target, { offset: 0, duration: 1.4 })
+    } else {
+      target?.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
+
+  // Ao focar um input no mobile, o teclado abre e o navegador (principalmente
+  // iOS Safari) faz seu próprio auto-scroll pra revelar o campo — o que, num
+  // layout com seções "pinadas" via ScrollTrigger, pode acabar pousando numa
+  // seção errada. Não dá pra prevenir esse auto-scroll de forma confiável, então
+  // deixamos ele acontecer, esperamos a viewport estabilizar e corrigimos a
+  // posição de volta pro campo focado usando o próprio Lenis.
+  function handleFormFocus(e) {
+    const target = e.target
+    if (!lenis || !(target instanceof HTMLElement)) return
+
+    settleCleanupRef.current?.()
+    lenis.stop()
+
+    let settled = false
+    const settle = () => {
+      if (settled) return
+      settled = true
+      lenis.start()
+      lenis.scrollTo(target, { offset: -16, immediate: true })
+    }
+
+    const vv = window.visualViewport
+    const fallback = setTimeout(settle, 350)
+    const onViewportResize = () => settle()
+    vv?.addEventListener('resize', onViewportResize)
+
+    settleCleanupRef.current = () => {
+      clearTimeout(fallback)
+      vv?.removeEventListener('resize', onViewportResize)
+    }
+  }
+
+  function handleFormBlur() {
+    settleCleanupRef.current?.()
+    settleCleanupRef.current = null
+    lenis?.start()
+  }
 
   useEffect(() => {
     if (!submitted || !successRef.current) return
@@ -62,13 +117,14 @@ export default function RSVPForm() {
     setDependentes((prev) => prev.map((dep) => (dep.id === id ? { ...dep, [field]: value } : dep)))
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
 
-    if (!nome.trim()) {
+    if (nome.trim().split(/\s+/).filter(Boolean).length < 2) {
       nomeRef.current?.focus()
       return
     }
+
     if (telefone.replace(/\D/g, '').length < 10) {
       telRef.current?.focus()
       return
@@ -85,12 +141,20 @@ export default function RSVPForm() {
       nome: nome.trim(),
       telefone: telefone.trim(),
       dependentes: dependentesPayload,
-      criado_em: new Date().toISOString(),
     }
 
-    submitRSVP(payload)
-    setSuccessName(payload.nome.split(' ')[0])
-    setSubmitted(true)
+    setSubmitError('')
+    setSubmitting(true)
+    try {
+      await submitRSVP(payload)
+      setSuccessName(payload.nome.split(' ')[0])
+      setSubmitted(true)
+    } catch (err) {
+      setSubmitError('Não conseguimos confirmar agora. Tenta de novo em instantes?')
+      console.error('[RSVP] falha ao gravar no Supabase:', err)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -122,7 +186,7 @@ export default function RSVPForm() {
 
         <div className="form-card" data-reveal>
           {!submitted ? (
-            <form id="rsvpForm" noValidate onSubmit={handleSubmit}>
+            <form id="rsvpForm" noValidate onSubmit={handleSubmit} onFocus={handleFormFocus} onBlur={handleFormBlur}>
               <div className="field">
                 <label htmlFor="nome">Seu nome completo</label>
                 <input
@@ -135,7 +199,13 @@ export default function RSVPForm() {
                   ref={nomeRef}
                   value={nome}
                   onChange={(e) => setNome(e.target.value)}
+                  onBlur={() => setNomeTouched(true)}
                 />
+                {nomeTouched && nomeIncompleto && (
+                  <p className="field-error field-error-spaced">
+                    Inclui pelo menos o sobrenome, pra gente te reconhecer na lista.
+                  </p>
+                )}
               </div>
 
               <div className="field">
@@ -153,7 +223,7 @@ export default function RSVPForm() {
                   onChange={(e) => setTelefone(maskPhone(e.target.value))}
                 />
                 <p className="field-hint">
-                  Preenchimento individual — se você for casado(a), sem crise! Enviamos esse mesmo link também para
+                  Preenchimento individual — se você for casado(a), fique tranquilo(a)! Enviamos esse mesmo link também para
                   confirmar seu cônjuge separadinho. 💛
                 </p>
               </div>
@@ -197,8 +267,10 @@ export default function RSVPForm() {
                 </button>
               </div>
 
-              <button type="submit" className="btn-submit">
-                Confirmar presença
+              {submitError && <p className="field-error">{submitError}</p>}
+
+              <button type="submit" className="btn-submit" disabled={submitting}>
+                {submitting ? 'Confirmando...' : 'Confirmar presença'}
               </button>
             </form>
           ) : (
@@ -213,6 +285,10 @@ export default function RSVPForm() {
                 Que alegria, <span id="successName">{successName || 'amigo(a)'}</span>! Já anotamos você com todo
                 carinho. Até outubro. 💛
               </p>
+              <button type="button" className="btn-continue" onClick={handleContinue}>
+                Ver local, dress code e presentes
+                <span className="btn-continue-arrow">↓</span>
+              </button>
             </div>
           )}
         </div>
