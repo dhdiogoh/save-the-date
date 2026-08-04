@@ -7,6 +7,6 @@ export const WEDDING_INFO = {
     mapsUrl:
       'https://www.google.com/maps/search/?api=1&query=Garden+821+Travessa+Nove+de+Janeiro+821+Belem+PA',
   },
-  rsvpDeadline: '2026-08-22',
+  rsvpDeadline: '2026-08-24',
   timeNote: 'às 17h',
 }
