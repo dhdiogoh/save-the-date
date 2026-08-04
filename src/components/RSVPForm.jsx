@@ -243,14 +243,15 @@ export default function RSVPForm() {
                         onChange={(e) => updateDependente(dep.id, 'nome', e.target.value)}
                       />
                       <input
-                        type="number"
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
                         placeholder="Idade"
                         className="dep-idade"
                         aria-label="Idade do dependente"
-                        min="0"
-                        max="17"
+                        maxLength={2}
                         value={dep.idade}
-                        onChange={(e) => updateDependente(dep.id, 'idade', e.target.value)}
+                        onChange={(e) => updateDependente(dep.id, 'idade', e.target.value.replace(/\D/g, ''))}
                       />
                       <button
                         type="button"
