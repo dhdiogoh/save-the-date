@@ -128,11 +128,12 @@ export default function Convite() {
 
           <button
             type="button"
-            className="invite-hint invite-hint-btn"
+            className="invite-hint invite-hint-btn invite-hint-primary"
             ref={hintRef}
             onClick={handleOpenEnvelope}
           >
-            <span>clique para abrir</span>
+            <span>continue para abrir</span>
+            <span className="invite-hint-arrow">↓</span>
           </button>
 
           <button
