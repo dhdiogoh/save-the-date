@@ -45,6 +45,36 @@ function preloadVideo(src) {
   })
 }
 
+// testa, num vídeo invisível descartável, se o navegador realmente vai deixar
+// tocar sozinho — no iOS com Modo de Baixo Consumo o autoplay é bloqueado
+// mesmo com muted+playsInline certos, e isso só se descobre tentando.
+function checkVideoAutoplay(src) {
+  return new Promise((resolve) => {
+    const video = document.createElement('video')
+    video.muted = true
+    video.playsInline = true
+    video.preload = 'auto'
+    video.src = src
+
+    let done = false
+    const finish = (canAutoplay) => {
+      if (done) return
+      done = true
+      video.pause()
+      video.removeAttribute('src')
+      video.load()
+      resolve(canAutoplay)
+    }
+
+    video
+      .play()
+      .then(() => finish(true))
+      .catch(() => finish(false))
+
+    setTimeout(() => finish(false), VIDEO_TIMEOUT_MS)
+  })
+}
+
 export default function LoadingScreen({ onComplete }) {
   const [visible, setVisible] = useState(true)
   const [progress, setProgress] = useState(0)
@@ -56,7 +86,7 @@ export default function LoadingScreen({ onComplete }) {
     document.body.style.overflow = 'hidden'
 
     let cancelled = false
-    const total = CRITICAL_IMAGES.length + 1
+    const total = CRITICAL_IMAGES.length + 2
     let loaded = 0
 
     const bumpProgress = () => {
@@ -64,9 +94,14 @@ export default function LoadingScreen({ onComplete }) {
       if (!cancelled) setProgress(Math.round((loaded / total) * 100))
     }
 
+    let canAutoplayVideo = false
     const assetPromises = [
       ...CRITICAL_IMAGES.map((src) => preloadImage(src).then(bumpProgress)),
       preloadVideo(HERO_VIDEO_URL).then(bumpProgress),
+      checkVideoAutoplay(HERO_VIDEO_URL).then((canAutoplay) => {
+        canAutoplayVideo = canAutoplay
+        bumpProgress()
+      }),
     ]
 
     const minTime = new Promise((resolve) => setTimeout(resolve, MIN_VISIBLE_MS))
@@ -78,7 +113,7 @@ export default function LoadingScreen({ onComplete }) {
         document.documentElement.style.overflow = ''
         document.body.style.overflow = ''
         setVisible(false)
-        onComplete?.()
+        onComplete?.(canAutoplayVideo)
       }
 
       if (screenRef.current) {

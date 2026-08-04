@@ -6,8 +6,9 @@ gsap.registerPlugin(ScrollTrigger)
 
 const HERO_VIDEO_URL =
   'https://r7gebaatjirfgncj.public.blob.vercel-storage.com/magnific_animate-this-garden-illus_626MOn6iJO.mp4'
+const HERO_FALLBACK_IMAGE = '/images/jardim-hero.webp'
 
-export default function Hero() {
+export default function Hero({ canAutoplayVideo = true }) {
   const heroRef = useRef(null)
   const videoRef = useRef(null)
   const facesRef = useRef(null)
@@ -18,13 +19,27 @@ export default function Hero() {
   const letteringRef = useRef(null)
 
   useEffect(() => {
-    // no iOS Safari, o atributo `muted` do JSX às vezes não "pega" a tempo
-    // pro autoplay ser liberado — forçar via ref garante que sempre toque.
     const video = videoRef.current
-    if (!video) return
+    if (!video || !canAutoplayVideo) return undefined
+
     video.muted = true
     video.play().catch(() => {})
-  }, [])
+
+    // segurança extra: se mesmo assim o autoplay real falhar (o teste no
+    // preload foi otimista), qualquer interação da pessoa libera o vídeo.
+    const tryPlayOnInteraction = () => {
+      video.play().catch(() => {})
+    }
+    window.addEventListener('pointerdown', tryPlayOnInteraction, { once: true })
+    window.addEventListener('touchstart', tryPlayOnInteraction, { once: true, passive: true })
+    window.addEventListener('scroll', tryPlayOnInteraction, { once: true, passive: true })
+
+    return () => {
+      window.removeEventListener('pointerdown', tryPlayOnInteraction)
+      window.removeEventListener('touchstart', tryPlayOnInteraction)
+      window.removeEventListener('scroll', tryPlayOnInteraction)
+    }
+  }, [canAutoplayVideo])
 
   useLayoutEffect(() => {
     // rostos entram de lados opostos e se unem no centro, bem devagar
@@ -72,9 +87,13 @@ export default function Hero() {
 
   return (
     <section className="hero" id="hero" ref={heroRef}>
-      <video ref={videoRef} className="hero-video" autoPlay loop muted playsInline>
-        <source src={HERO_VIDEO_URL} type="video/mp4" />
-      </video>
+      {canAutoplayVideo ? (
+        <video ref={videoRef} className="hero-video" autoPlay loop muted playsInline>
+          <source src={HERO_VIDEO_URL} type="video/mp4" />
+        </video>
+      ) : (
+        <img className="hero-video" src={HERO_FALLBACK_IMAGE} alt="" />
+      )}
       <div className="hero-veil" />
 
       <div className="hero-inner">

@@ -13,15 +13,23 @@ import Encerramento from '../components/Encerramento'
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true)
+  const [canAutoplayVideo, setCanAutoplayVideo] = useState(true)
 
   if (isLoading) {
-    return <LoadingScreen onComplete={() => setIsLoading(false)} />
+    return (
+      <LoadingScreen
+        onComplete={(canAutoplay) => {
+          setCanAutoplayVideo(canAutoplay)
+          setIsLoading(false)
+        }}
+      />
+    )
   }
 
   return (
     <LenisProvider>
       <RevealProvider>
-        <Hero />
+        <Hero canAutoplayVideo={canAutoplayVideo} />
         <Antecipacao />
         <Convite />
         <RSVPForm />
