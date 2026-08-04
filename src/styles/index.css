@@ -1097,6 +1097,51 @@ section {
   fill: none;
   stroke-width: 1.6;
 }
+.gifts-thankyou {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  max-width: 680px;
+  margin-inline: auto;
+  padding: 0.9rem 1.2rem;
+  background: rgba(163, 171, 132, 0.14);
+  border: 1px solid rgba(163, 171, 132, 0.35);
+  border-radius: 16px;
+}
+.gifts-thankyou .check {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--color-sage);
+  color: var(--color-ivory);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.gifts-thankyou .check svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+}
+.gifts-thankyou p {
+  flex: 1;
+  font-size: 0.86rem;
+  color: var(--color-ink);
+  line-height: 1.5;
+}
+.gifts-thankyou button {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  line-height: 1;
+  color: var(--color-ink-soft);
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+}
 .gifts-head {
   display: flex;
   flex-direction: column;

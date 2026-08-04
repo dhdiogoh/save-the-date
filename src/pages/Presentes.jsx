@@ -1,13 +1,24 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { LenisProvider } from '../context/LenisContext'
 import { RevealProvider } from '../context/RevealContext'
 import AccentIllustration from '../components/AccentIllustration'
 import GiftCard from '../components/GiftCard'
 import GiftCheckoutModal from '../components/GiftCheckoutModal'
 import { supabase } from '../lib/supabaseClient'
+import { isMobileDevice } from '../hooks/useIsMobile'
 
 export default function Presentes() {
+  // lista longa, muitos presentes — no mobile o scroll suavizado do Lenis
+  // deixa navegar rápido pra cima/baixo mais lento. Usa o scroll nativo aqui.
+  if (isMobileDevice()) {
+    return (
+      <RevealProvider>
+        <PresentesContent />
+      </RevealProvider>
+    )
+  }
+
   return (
     <LenisProvider>
       <RevealProvider>
@@ -22,6 +33,8 @@ function PresentesContent() {
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState(false)
   const [selectedGift, setSelectedGift] = useState(null)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [showThankYou, setShowThankYou] = useState(() => searchParams.get('obrigado') === '1')
 
   async function loadGifts() {
     if (!supabase) {
@@ -57,6 +70,15 @@ function PresentesContent() {
     }
   }, [])
 
+  useEffect(() => {
+    if (!showThankYou) return
+    // limpa o ?obrigado=1 da URL pra não reaparecer se a pessoa recarregar
+    const next = new URLSearchParams(searchParams)
+    next.delete('obrigado')
+    setSearchParams(next, { replace: true })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   return (
     <section className="gifts-page bg-ivory-2">
       <AccentIllustration
@@ -77,6 +99,23 @@ function PresentesContent() {
           </svg>
           Voltar
         </Link>
+
+        {showThankYou && (
+          <div className="gifts-thankyou">
+            <div className="check">
+              <svg viewBox="0 0 24 24">
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+            </div>
+            <p>
+              Recebemos seu pagamento! Assim que for confirmado, a barra de progresso do presente atualiza sozinha.
+              Muito obrigado. 💛
+            </p>
+            <button type="button" aria-label="Fechar" onClick={() => setShowThankYou(false)}>
+              &times;
+            </button>
+          </div>
+        )}
 
         <div className="gifts-head">
           <span className="eyebrow eyebrow-line" data-reveal>
