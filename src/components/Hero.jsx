@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
@@ -9,12 +9,22 @@ const HERO_VIDEO_URL =
 
 export default function Hero() {
   const heroRef = useRef(null)
+  const videoRef = useRef(null)
   const facesRef = useRef(null)
   const faceDiogoRef = useRef(null)
   const faceAmandaRef = useRef(null)
   const brandRef = useRef(null)
   const monogramRef = useRef(null)
   const letteringRef = useRef(null)
+
+  useEffect(() => {
+    // no iOS Safari, o atributo `muted` do JSX às vezes não "pega" a tempo
+    // pro autoplay ser liberado — forçar via ref garante que sempre toque.
+    const video = videoRef.current
+    if (!video) return
+    video.muted = true
+    video.play().catch(() => {})
+  }, [])
 
   useLayoutEffect(() => {
     // rostos entram de lados opostos e se unem no centro, bem devagar
@@ -62,7 +72,7 @@ export default function Hero() {
 
   return (
     <section className="hero" id="hero" ref={heroRef}>
-      <video className="hero-video" autoPlay loop muted playsInline>
+      <video ref={videoRef} className="hero-video" autoPlay loop muted playsInline>
         <source src={HERO_VIDEO_URL} type="video/mp4" />
       </video>
       <div className="hero-veil" />
