@@ -122,11 +122,6 @@ export default function GiftCheckoutModal({ gift, onClose }) {
             <strong>{currency.format(valorTotal)}</strong>
           </div>
 
-          <p className="field-hint gift-modal-checkout-note">
-            Na próxima tela, o checkout pode pedir um endereço — é só o endereço de cobrança padrão, não tem entrega
-            de verdade. Pode preencher com o seu.
-          </p>
-
           {error && <p className="field-error">{error}</p>}
 
           <button type="submit" className="btn-submit" disabled={submitting}>
