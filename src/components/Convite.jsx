@@ -117,7 +117,7 @@ export default function Convite() {
 
             <div className="env-card" ref={cardRef}>
               <div className="env-card-img">
-                <img src="/images/illustrations/convite/save-the-date-carta.png" alt="Save the Date - Diogo e Amanda, 24 de outubro de 2026" />
+                <img src="/images/illustrations/convite/convite-save-the-date-att.png" alt="Save the Date - Diogo e Amanda, 24 de outubro de 2026" />
               </div>
             </div>
 
