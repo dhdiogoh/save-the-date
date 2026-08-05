@@ -129,7 +129,7 @@ export default function Hero({ canAutoplayVideo = true }) {
       </div>
 
       <div className="scroll-cue">
-        <span>continue</span>
+        <span>continue scrollando</span>
         <span className="dot" />
       </div>
     </section>
