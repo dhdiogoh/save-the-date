@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { supabase } from '../../lib/supabaseClient'
+import { supabaseAdmin } from '../../lib/supabaseAdminClient'
 
 const currency = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
 const dateFormat = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
@@ -24,8 +24,8 @@ export default function AdminDashboard({ session }) {
       setError('')
 
       const [rsvpRes, comprasRes] = await Promise.all([
-        supabase.from('rsvp_confirmations').select('*').order('criado_em', { ascending: false }),
-        supabase
+        supabaseAdmin.from('rsvp_confirmations').select('*').order('criado_em', { ascending: false }),
+        supabaseAdmin
           .from('compras')
           .select('*, presentes(nome)')
           .order('created_at', { ascending: false }),
@@ -50,7 +50,7 @@ export default function AdminDashboard({ session }) {
   }, [])
 
   function handleLogout() {
-    supabase.auth.signOut()
+    supabaseAdmin.auth.signOut()
   }
 
   const totalDependentes = confirmacoes.reduce((sum, r) => sum + (r.dependentes?.length || 0), 0)

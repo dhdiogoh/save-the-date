@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { supabase } from '../../lib/supabaseClient'
+import { supabaseAdmin } from '../../lib/supabaseAdminClient'
 
 export default function AdminLogin() {
   const [email, setEmail] = useState('')
@@ -12,7 +12,7 @@ export default function AdminLogin() {
     setError('')
     setSubmitting(true)
 
-    const { error: authError } = await supabase.auth.signInWithPassword({ email: email.trim(), password })
+    const { error: authError } = await supabaseAdmin.auth.signInWithPassword({ email: email.trim(), password })
 
     if (authError) {
       setError('Email ou senha incorretos.')

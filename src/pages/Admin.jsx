@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { supabase } from '../lib/supabaseClient'
+import { supabaseAdmin } from '../lib/supabaseAdminClient'
 import AdminLogin from '../components/admin/AdminLogin'
 import AdminDashboard from '../components/admin/AdminDashboard'
 
@@ -7,14 +7,14 @@ export default function Admin() {
   const [session, setSession] = useState(undefined)
 
   useEffect(() => {
-    if (!supabase) {
+    if (!supabaseAdmin) {
       setSession(null)
       return undefined
     }
 
-    supabase.auth.getSession().then(({ data }) => setSession(data.session))
+    supabaseAdmin.auth.getSession().then(({ data }) => setSession(data.session))
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
+    const { data: listener } = supabaseAdmin.auth.onAuthStateChange((_event, newSession) => {
       setSession(newSession)
     })
 
